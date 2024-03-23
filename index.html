@@ -5,12 +5,36 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles.css">
-  <title>常用链接</title>
+  <title>常用的链接</title>
+
+  <script>
+    function displayBeijingTime() {
+      var now = new Date();
+      var year = now.getUTCFullYear();
+      var month = now.getUTCMonth() + 1;
+      var date = now.getUTCDate();
+      var hours = now.getUTCHours() + 8; // 加 8 小时是因为北京在东八区
+      var minutes = now.getUTCMinutes();
+      var seconds = now.getUTCSeconds();
+      
+      var timeString = year + "年" + month + "月" + date + "日 " + hours + ":" + minutes + ":" + seconds;
+      document.getElementById("beijing-time").innerText = timeString;
+    }
+
+    // 每秒更新一次时间
+    setInterval(displayBeijingTime, 1000);
+
+  </script>
+
+
+
 </head>
 <body>
   <header>
     <h1>常用链接</h1>
   </header>
+
+
   <section>
 <a href="https://filehelper.weixin.qq.com/?from=windows&type=recommend" target="_blank">    
 <button>微信传文件</button></a>
@@ -31,10 +55,19 @@
   <a href="https://ata.360.net/detect" target="_blank"> 
      <button>360沙箱云</button></a>
   <a href="https://www.sordum.org" target="_blank"> 
-  <button>sordum工具</button></a>
-   <button>空</button>
- <button>空</button>
-   <button>空</button>
+  <button>Sordum工具</button></a>
+   <a href="https://chat.tomyres.com/#/pages/web/index?n=1" target="_blank"> 
+  <button>GPT国内镜像</button></a>
+  <a href="https://www.nict.go.jp/JST/JST5.html" target="_blank"> 
+  <button>JST</button></a>
+   <a href="https://bitbucket.org/WindowsAddict/microsoft-activation-scripts/get/master.zip" target="_blank"> 
+  <button>系统激活工具</button></a>
   </section>
+
+<section>
+<dibu>irm https://massgrave.dev/get | iex<p>
+<div id="beijing-time"></div> </dibu>
+</section>
+
 </body>
 </html>
