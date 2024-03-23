@@ -27,7 +27,7 @@ button {
   background-color: #81A68E;
   color: #fff;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
 width: 160px;
   height: 50px;
 }
@@ -48,6 +48,6 @@ button:disabled {
 }
 
 dibu{
-font-size: 16px;
+font-size: 14px;
 color:#81A68E;
 }
