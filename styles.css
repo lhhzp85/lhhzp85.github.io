@@ -34,11 +34,11 @@ width: 160px;
 
 
 button:hover {
-  background-color: #F2B47E;
+  background-color: #3e8e41;
 }
 
 button:active {
-  background-color: #F2B47E;
+  background-color: #3e8e41;
 }
 
 button:disabled {
