@@ -1,14 +1,160 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="https://ss1.bdstatic.com/5eN1bjq8AAUYm2jgoY3K/r/www/static/css/searchbox_56d4f5a2.css">
-  <title>常用链接</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <style>
+  :root {
+    --primary-color: #2c3e50;
+    --hover-color: #34495e;
+    --shadow-color: rgba(0,0,0,0.1);
+  }
 
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: #f5f6fa;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+
+  section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px var(--shadow-color);
+  }
+
+  button, .dropbtn {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  button:hover, .dropbtn:hover {
+    background: var(--hover-color);
+    transform: translateY(-1px);
+  }
+
+  .dropdown {
+    position: relative;
+    margin: 8px 0;
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    width: 100%;
+    background: white;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    border-radius: 6px;
+    z-index: 1;
+  }
+
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+
+  .dropdown-content a {
+    display: block;
+    padding: 12px;
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .dropdown-content a:hover {
+    background: #f8f9fa;
+  }
+
+  .search-container {
+    grid-column: 1 / -1;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .baidusearch {
+    display: flex;
+    gap: 8px;
+  }
+
+  .baidusearch-input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+  }
+
+  .baidusearch-button {
+    padding: 12px 24px;
+  }
+
+  /* 页脚专用样式 */
+  section:last-child {
+    grid-column: 1 / -1;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    margin-top: 2rem;
+  }
+
+  footer {
+    width: 100%;
+    padding: 1.5rem 0;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 8px;
+  }
+
+  .dibu {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 768px) {
+    main {
+      grid-template-columns: 1fr;
+      padding: 0;
+    }
+    
+    section {
+      margin: 0.5rem;
+      padding: 1rem;
+    }
+
+    footer {
+      padding: 1rem;
+      border-radius: 0;
+    }
+  }
+  </style>
+  <link rel="preload" href="https://ss1.bdstatic.com/5eN1bjq8AAUYm2jgoY3K/r/www/static/css/searchbox_56d4f5a2.css" as="style" onload="this.rel='stylesheet'">
+  <title>常用链接</title>
 </head>
+
 <body>
   <header>
     <h1>常用链接</h1>
@@ -164,23 +310,51 @@
 
     </section>
 
-<!-- 新增百度搜索框区域 -->
-<section class="search-container">
-  <div class="baidusearch">
-    <form action="https://www.baidu.com/s" method="get" target="_blank">
-      <!-- 添加了target="_blank"以在新窗口中打开搜索结果 -->
-      <input type="text" name="wd" class="baidusearch-input" placeholder="百度搜索">
-      <button type="submit" class="baidusearch-button">搜索</button>
-    </form>
-  </div>
-</section>
+    <section>
+ <button disabled>预留位</button>
+ <button disabled>预留位</button>
+ <button disabled>预留位</button>
+ <button disabled>预留位</button>
+ <button disabled>预留位</button>
+   <button disabled>预留位</button>
+
+    </section>
+
+    </section>
 
     <section>
-      <div class="dibu">
-        在线激活命令 irm https://get.activated.win | iex
-        <p>&#169;️2025  *love12sing</p>
+ <button disabled>预留位</button>
+ <button disabled>预留位</button>
+ <button disabled>预留位</button>
+ <button disabled>预留位</button>
+ <button disabled>预留位</button>
+   <button disabled>预留位</button>
+
+    </section>
+
+    <!-- 搜索框 -->
+    <section class="search-container">
+      <div class="baidusearch">
+        <form action="https://www.baidu.com/s" method="get" target="_blank">
+          <input type="text" name="wd" class="baidusearch-input" placeholder="百度搜索">
+          <button type="submit" class="baidusearch-button">搜索</button>
+        </form>
       </div>
     </section>
+
+    <!-- 页脚 -->
+    <section>
+      <footer>
+        <div class="dibu">
+          <div>在线激活命令 irm https://get.activated.win | iex</div>
+          <p>©️2025 *love12sing</p>
+        </div>
+      </footer>
+    </section>
   </main>
+
+  <noscript>
+    <link rel="stylesheet" href="https://ss1.bdstatic.com/5eN1bjq8AAUYm2jgoY3K/r/www/static/css/searchbox_56d4f5a2.css">
+  </noscript>
 </body>
 </html>
