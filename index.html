@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -81,10 +80,70 @@
     color: var(--primary-color);
     text-decoration: none;
     transition: background 0.2s;
+    position: relative;
+    white-space: nowrap;
   }
 
   .dropdown-content a:hover {
     background: #f8f9fa;
+  }
+
+  /* 新增三级菜单样式 */
+  .dropdown-submenu {
+    position: relative;
+  }
+
+  .dropdown-content-sub {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    background: white;
+    box-shadow: 4px 4px 12px var(--shadow-color);
+    border-radius: 0 6px 6px 6px;
+    min-width: 160px;
+    z-index: 2;
+  }
+
+  .dropdown-submenu:hover .dropdown-content-sub {
+    display: block;
+  }
+
+  .submenu-trigger {
+    padding-right: 24px !important;
+    position: relative;
+  }
+
+  .arrow {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8em;
+    color: #95a5a6;
+  }
+
+  @media (max-width: 768px) {
+    .dropdown-content-sub {
+      left: 50%;
+      top: 100%;
+      box-shadow: none;
+    }
+    
+    main {
+      grid-template-columns: 1fr;
+      padding: 0;
+    }
+    
+    section {
+      margin: 0.5rem;
+      padding: 1rem;
+    }
+
+    footer {
+      padding: 1rem;
+      border-radius: 0;
+    }
   }
 
   .search-container {
@@ -109,7 +168,6 @@
     padding: 12px 24px;
   }
 
-  /* 页脚专用样式 */
   section:last-child {
     grid-column: 1 / -1;
     background: transparent;
@@ -134,23 +192,6 @@
     flex-direction: column;
     gap: 0.5rem;
   }
-
-  @media (max-width: 768px) {
-    main {
-      grid-template-columns: 1fr;
-      padding: 0;
-    }
-    
-    section {
-      margin: 0.5rem;
-      padding: 1rem;
-    }
-
-    footer {
-      padding: 1rem;
-      border-radius: 0;
-    }
-  }
   </style>
   <link rel="preload" href="https://ss1.bdstatic.com/5eN1bjq8AAUYm2jgoY3K/r/www/static/css/searchbox_56d4f5a2.css" as="style" onload="this.rel='stylesheet'">
   <title>常用链接</title>
@@ -164,159 +205,152 @@
   <main>
     <!-- 常用链接区域 -->
     <section>
-	    <a href="https://filehelper.weixin.qq.com/?from=windows&type=recommend" target="_blank"><button>微信传文件</button></a>
-	    <div class="dropdown">
-  <button class="dropbtn">办事专用</button>
-  <div class="dropdown-content">
-    <a href="https://www.beijing.gov.cn/" target="_blank">首都之窗</a>
-    <a href="https://xkczb.jtw.beijing.gov.cn/" target="_blank">北京小客车摇号</a>
-	<a href="https://gjj.beijing.gov.cn/web/index/" target="_blank">北京公积金</a>
-	<a href="https://zwfw.gaj.beijing.gov.cn/crjgl/" target="_blank">北京出入境业务办理</a>
-	<a href="https://fuwu.rsj.beijing.gov.cn/zhrs/yltc/yltc-home" target="_blank">北京社保</a>
-	  <a href="https://fw.ybj.beijing.gov.cn/hallEnter/#/Index" target="_blank">北京医保公共服务</a>
-	  <a href="https://www.chsi.com.cn/" target="_blank">学信网</a>
-	   <a href="https://www.pearsonvue.com/cn/zh/test-takers.html" target="_blank">培生pearson</a>
-  </div>
-</div>
-	  <!-- 新增下拉框区域 -->
-<div class="dropdown">
-  <button class="dropbtn">学校专用</button>
-  <div class="dropdown-content">
-    <a href="https://xsjk.bjedu.cn/physical/logininfo/LoginInfoAction.a?LogOut" target="_blank">北京市学生健康体检电子回执系统</a>
-    <a href="https://cardcenter.bjedu.cn/becom-sccms-web/a/login" target="_blank">北京市中小学学生卡管理与应用服务平台</a>
-    <a href="https://qhfzyf.tsinghuax.com/" target="_blank">清永选课系统</a>
-    <a href="http://www.kebendashi.com/" target="_blank">口算大师</a>
+      <a href="https://filehelper.weixin.qq.com/?from=windows&type=recommend" target="_blank"><button>微信传文件</button></a>
+      <div class="dropdown">
+        <button class="dropbtn">办事专用</button>
+        <div class="dropdown-content">
+          <a href="https://www.beijing.gov.cn/" target="_blank">首都之窗</a>
+          <a href="https://xkczb.jtw.beijing.gov.cn/" target="_blank">北京小客车摇号</a>
+          <a href="https://gjj.beijing.gov.cn/web/index/" target="_blank">北京公积金</a>
+          <a href="https://zwfw.gaj.beijing.gov.cn/crjgl/" target="_blank">北京出入境业务办理</a>
+          <a href="https://fuwu.rsj.beijing.gov.cn/zhrs/yltc/yltc-home" target="_blank">北京社保</a>
+          <a href="https://fw.ybj.beijing.gov.cn/hallEnter/#/Index" target="_blank">北京医保公共服务</a>
+          <a href="https://www.chsi.com.cn/" target="_blank">学信网</a>
+          <a href="https://www.pearsonvue.com/cn/zh/test-takers.html" target="_blank">培生pearson</a>
+        </div>
+      </div>
 
-  </div>
-</div>
+      <div class="dropdown">
+        <button class="dropbtn">学校专用</button>
+        <div class="dropdown-content">
+          <a href="https://xsjk.bjedu.cn/physical/logininfo/LoginInfoAction.a?LogOut" target="_blank">北京市学生健康体检电子回执系统</a>
+          <a href="https://cardcenter.bjedu.cn/becom-sccms-web/a/login" target="_blank">北京市中小学学生卡管理与应用服务平台</a>
+          <a href="https://qhfzyf.tsinghuax.com/" target="_blank">清永选课系统</a>
+          <a href="http://www.kebendashi.com/" target="_blank">口算大师</a>
+        </div>
+      </div>
 
-<div class="dropdown">
-  <button class="dropbtn">大文件传输</button>
-  <div class="dropdown-content">
+      <div class="dropdown">
+        <button class="dropbtn">大文件传输</button>
+        <div class="dropdown-content">
           <a href="https://wetransfer.com/" target="_blank">Wetransfer</a>
-		   <a href="https://www.myairbridge.com/en/" target="_blank">MyairBridge</a>
-		      <a href="https://wormhole.app/" target="_blank">Wormhole</a>
-   <a href="https://cowtransfer.com/" target="_blank">奶牛快传</a>
-  </div>
-</div>
- </section>
- <section>
-<div class="dropdown">
-  <button class="dropbtn">新闻门户</button>
-  <div class="dropdown-content">
-  
-<a href="http://www.xinhuanet.com/" target="_blank">新华网</a>
-<a href="http://www.people.com.cn/" target="_blank">人民网</a>
-<a href="http://cn.chinadaily.com.cn/" target="_blank">中国日报</a>
-<a href="https://www.gmw.cn/" target="_blank">光明网</a>
-<a href="https://www.qianlong.com/" target="_blank">千龙网</a>
-<a href="https://www.qq.com/" target="_blank">腾讯网</a>
-<a href="https://www.ifeng.com/" target="_blank">凤凰网</a>
+          <a href="https://www.myairbridge.com/en/" target="_blank">MyairBridge</a>
+          <a href="https://wormhole.app/" target="_blank">Wormhole</a>
+          <a href="https://cowtransfer.com/" target="_blank">奶牛快传</a>
+        </div>
+      </div>
+    </section>
 
-  </div>
-</div>
+    <section>
+      <div class="dropdown">
+        <button class="dropbtn">新闻门户</button>
+        <div class="dropdown-content">
+          <a href="http://www.xinhuanet.com/" target="_blank">新华网</a>
+          <a href="http://www.people.com.cn/" target="_blank">人民网</a>
+          <a href="http://cn.chinadaily.com.cn/" target="_blank">中国日报</a>
+          <a href="https://www.gmw.cn/" target="_blank">光明网</a>
+          <a href="https://www.qianlong.com/" target="_blank">千龙网</a>
+          <a href="https://www.qq.com/" target="_blank">腾讯网</a>
+          <a href="https://www.ifeng.com/" target="_blank">凤凰网</a>
+        </div>
+      </div>
 
-<div class="dropdown">
-  <button class="dropbtn">办公链接</button>
-  <div class="dropdown-content">
-  <a href="https://www.kdocs.cn/" target="_blank">金山文档</a>
-<a href="https://docs.qq.com/" target="_blank">腾讯文档</a>
-<a href="https://smbcloud.tp-link.com.cn/" target="_blank">TP-link商云</a>
-<a href="https://www.yuque.com/" target="_blank">语雀</a>
-<a href="https://dashi.163.com/login/?from=dashi" target="_blank">邮箱大师</a>
+      <div class="dropdown">
+        <button class="dropbtn">办公链接</button>
+        <div class="dropdown-content">
+          <a href="https://www.kdocs.cn/" target="_blank">金山文档</a>
+          <a href="https://docs.qq.com/" target="_blank">腾讯文档</a>
+          <a href="https://smbcloud.tp-link.com.cn/" target="_blank">TP-link商云</a>
+          <a href="https://www.yuque.com/" target="_blank">语雀</a>
+          <a href="https://dashi.163.com/login/?from=dashi" target="_blank">邮箱大师</a>
+        </div>
+      </div>
 
-  </div>
-</div>
-
-  
-
-
-
-	    	 <div class="dropdown">
-  <button class="dropbtn">操作系统</button>
-  <div class="dropdown-content">
- <a href="https://dev.azure.com/massgrave/_git/Microsoft-Activation-Scripts" target="_blank">激活源代码</a>
- <a href="https://lhhzp85.github.io/Activation.cmd" target="_blank">激活命令</a>
-<a href="https://learn.microsoft.com/zh-cn/windows/release-health/" target="_blank">Windows版本运行情况</a>
-<a href="https://www.itsk.com/" target="_blank">IT天空</a>
-  <a href="http://ithaoge.cn/" target="_blank">IT豪哥</a>
-<a href="https://uupdump.net/" target="_blank">UUP dump</a>
- <a href="https://www.uupdump.cn/" target="_blank">UUP dump中文站</a>
-<a href="https://massgrave.dev/genuine-installation-media" target="_blank">系统下载列表</a>
- <a href="https://free.drweb.cn/download+cureit+free/" target="_blank">大蜘蛛清除工具</a>
-  </div>
-
-</div>  
+      <div class="dropdown">
+        <button class="dropbtn">操作系统</button>
+        <div class="dropdown-content">
+          <a href="https://dev.azure.com/massgrave/_git/Microsoft-Activation-Scripts" target="_blank">激活源代码</a>
+          <a href="https://lhhzp85.github.io/Activation.cmd" target="_blank">激活命令</a>
+          <a href="https://learn.microsoft.com/zh-cn/windows/release-health/" target="_blank">Windows版本运行情况</a>
+          <a href="https://www.itsk.com/" target="_blank">IT天空</a>
+          <a href="http://ithaoge.cn/" target="_blank">IT豪哥</a>
+          <a href="https://uupdump.net/" target="_blank">UUP dump</a>
+          <a href="https://www.uupdump.cn/" target="_blank">UUP dump中文站</a>
+          <a href="https://massgrave.dev/genuine-installation-media" target="_blank">系统下载列表</a>
+          <a href="https://free.drweb.cn/download+cureit+free/" target="_blank">大蜘蛛清除工具</a>
+        </div>
+      </div>  
       <a href="http://www.netbian.com/" target="_blank"><button>桌面壁纸</button></a>
- </section>
- <section>
-<div class="dropdown">
-  <button class="dropbtn">AI大模型</button>
-  <div class="dropdown-content">
-    <a href="https://kimi.moonshot.cn/" target="_blank" target="_blank">Kimi</a>
-    <a href="https://yiyan.baidu.com/" target="_blank">文心一言</a>
-   <a href="https://tongyi.aliyun.com/" target="_blank">通义千问</a>
-   <a href="https://xinghuo.xfyun.cn/" target="_blank">讯飞星火</a>
-   <a href="https://yuanbao.tencent.com" target="_blank">腾讯元宝</a>
-   <a href="https://www.doubao.com/chat/" target="_blank">豆包</a>
-   <a href="https://chat.deepseek.com/" target="_blank">deepseek</a>
-  </div>
-</div>
+    </section>
+
+    <section>
+      <div class="dropdown">
+        <button class="dropbtn">AI大模型</button>
+        <div class="dropdown-content">
+          <a href="https://kimi.moonshot.cn/" target="_blank">Kimi</a>
+          <a href="https://yiyan.baidu.com/" target="_blank">文心一言</a>
+          <a href="https://tongyi.aliyun.com/" target="_blank">通义千问</a>
+          <a href="https://xinghuo.xfyun.cn/" target="_blank">讯飞星火</a>
+          <a href="https://yuanbao.tencent.com" target="_blank">腾讯元宝</a>
+          <a href="https://www.doubao.com/chat/" target="_blank">豆包</a>
+          <a href="https://chat.deepseek.com/" target="_blank">deepseek</a>
+        </div>
+      </div>
       <a href="https://ata.360.net/" target="_blank"><button>360沙箱云</button></a>
       <a href="https://www.sordum.org" target="_blank"><button>Sordum工具</button></a>
 
-<div class="dropdown">
-  <button class="dropbtn">时间及天气</button>
-  <div class="dropdown-content">
-<a href="http://www.weather.com.cn/" target="_blank">天气网</a>
-    <a href="https://www.nict.go.jp/JST/JST5.html" target="_blank" target="_blank">JST时间</a>
-    <a href="https://time.is/" target="_blank">Time.is</a>
-   <a href="https://www.timeanddate.com/" target="_blank">TimeandDate</a>
-   <a href="https://www.hko.gov.hk/sc/gts/time/clock_e.html" target="_blank">香港天文台</a>
-  </div>
-</div>
-
-  
-      
+      <div class="dropdown">
+        <button class="dropbtn">时间及天气</button>
+        <div class="dropdown-content">
+          <a href="http://www.weather.com.cn/" target="_blank">天气网</a>
+          <a href="https://www.nict.go.jp/JST/JST5.html" target="_blank">JST时间</a>
+          <a href="https://time.is/" target="_blank">Time.is</a>
+          <a href="https://www.timeanddate.com/" target="_blank">TimeandDate</a>
+          <a href="https://www.hko.gov.hk/sc/gts/time/clock_e.html" target="_blank">香港天文台</a>
+        </div>
+      </div>
     </section>
     
     <section>
-          <div class="dropdown">
-  <button class="dropbtn">十分钟邮箱</button>
-  <div class="dropdown-content">
-    <a href="https://mail.td/zh" target="_blank" target="_blank">mail.td</a>
-    <a href="https://10-minutemail.com/" target="_blank">10-minutemail</a>
-    <a href="https://tempmail.plus/zh/#!" target="_blank">tempmail</a>
-     <a href="https://tempmail.cn/" target="_blank">tempmail.cn</a>
-     <a href="https://10minutemail.com/?lang=zh/" target="_blank">10minutemail</a>  
-     <a href="http://24mail.chacuo.net/" target="_blank">24mail</a>  
-  </div>
-</div>
+      <div class="dropdown">
+        <button class="dropbtn">十分钟邮箱</button>
+        <div class="dropdown-content">
+          <a href="https://mail.td/zh" target="_blank">mail.td</a>
+          <a href="https://10-minutemail.com/" target="_blank">10-minutemail</a>
+          <a href="https://tempmail.plus/zh/#!" target="_blank">tempmail</a>
+          <a href="https://tempmail.cn/" target="_blank">tempmail.cn</a>
+          <a href="https://10minutemail.com/?lang=zh/" target="_blank">10minutemail</a>  
+          <a href="http://24mail.chacuo.net/" target="_blank">24mail</a>  
+        </div>
+      </div>
       <a href="https://www.ijiaodui.com/workbench/" target="_blank"><button>文字校对</button></a>
       <a href="https://ipv4calc.bmcx.com/" target="_blank"><button>子网掩码计算</button></a>
       <a href="https://pan.yukaidi.com/s/WO01Id" target="_blank"><button>维护小工具</button></a>
- </section>
- <section>
-      <a href="https://pan.yukaidi.com/s/OEY6U9" target="_blank"><button>网管小工具</button></a>
-      <a href="https://picwish.cn/" target="_blank"><button>佐糖图片处理</button></a>
-
-  <a href="https://tool.browser.qq.com/" target="_blank"><button>帮小忙</button></a>
-
-<div class="dropdown">
-  <button class="dropbtn">娱乐电影</button>
-  <div class="dropdown-content">
-  <a href="https://www.4k1080.com/" target="_blank">蓝光电影网</a>
-  <a href="https://dy2018.com/" target="_blank">电影天堂</a>
-  </div>
-</div  >
- </section>
- <section>
- <button disabled>预留位</button>
-
-
     </section>
 
+    <section>
+      <a href="https://pan.yukaidi.com/s/OEY6U9" target="_blank"><button>网管小工具</button></a>
+      <a href="https://picwish.cn/" target="_blank"><button>佐糖图片处理</button></a>
+      <a href="https://tool.browser.qq.com/" target="_blank"><button>帮小忙</button></a>
 
+      <!-- 修改后的娱乐电影区块 -->
+      <div class="dropdown">
+        <button class="dropbtn">娱乐电影</button>
+        <div class="dropdown-content">
+          <a href="https://www.4k1080.com/" target="_blank">蓝光电影网</a>
+          <div class="dropdown-submenu">
+            <a class="submenu-trigger">电影天堂 <span class="arrow">▶</span></a>
+            <div class="dropdown-content-sub">
+              <a href="https://dy2018.com/" target="_blank">电影天堂1站</a>
+              <a href="https://www.dytt89.com/" target="_blank">电影天堂2站</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <button disabled>预留位</button>
     </section>
 
     <!-- 搜索框 -->
