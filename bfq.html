@@ -4,21 +4,129 @@
     <meta charset="UTF-8">
     <title>计时器 & 音乐播放器</title>
     <style>
-        :root {
-            --primary: #2196F3;
-            --secondary: #4CAF50;
-        }
-        body {
-            font-family: 'Segoe UI', system-ui;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0;
-            padding: 2rem;
+        /* 新增的按钮状态样式 */
+        button {
+            /* 基础状态 */
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
         }
 
+        /* 悬停状态：颜色加深 + 阴影增强 */
+        button:hover {
+            background: #1976D2;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateY(-1px);
+        }[1,6](@ref)
+
+        /* 按下状态：颜色更深 + 阴影缩小 */
+        button:active {
+            background: #0D47A1;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transform: translateY(1px);
+        }[1,2](@ref)
+
+        /* 焦点状态：添加轮廓 */
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(33,150,243,0.3);
+        }[4](@ref)
+
+        /* 禁用状态（如果未来需要） */
+        button:disabled {
+            background: #BBDEFB;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* 播放状态的特殊效果 */
+        .playing {
+            background: var(--secondary);
+            box-shadow: 0 0 15px rgba(76,175,80,0.3);
+        }
+        .playing:hover {
+            background: #45a049;
+        }
+        .playing:active {
+            background: #388E3C;
+        }
+
+        /* 激活状态按钮（模式切换） */
+        .active {
+            background: #FF9800 !important;
+        }
+        .active:hover {
+            background: #F57C00 !important;
+        }
+
+        /* 新增波纹动画效果 */
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        button::after {
+            content: '';
+            display: block;
+            position: absolute;
+            background: rgba(255,255,255,0.3);
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border-radius: 50%;
+            transform: scale(0);
+        }
+        button:active::after {
+            animation: ripple 0.6s ease-out;
+        }
+
+        /* 原有样式保持不变 */
+        :root { --primary: #2196F3; --secondary: #4CAF50; }
+body {
+    font-family: 'Segoe UI', system-ui;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 垂直居中 */
+    align-items: center; /* 水平居中 */
+    margin: 0;
+    padding: 20px;
+}
+
+.timer-container {
+    background: rgba(255,255,255,0.95);
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto; /* 双保险居中 */
+    backdrop-filter: blur(10px);
+}
+
+.player {
+    background: rgba(255,255,255,0.95);
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto; /* 双保险居中 */
+    backdrop-filter: blur(10px);
+}
         /* 计时器样式 */
         .timer-container {
             background: rgba(255,255,255,0.95);
@@ -144,8 +252,25 @@
         .active-timer {
             animation: pulse 2s infinite;
         }
+/* 新增当前歌曲高亮样式 */
+.song-item.active-song {
+    background: #e3f2fd; /* 浅蓝色背景 */
+    box-shadow: 0 2px 8px rgba(33,150,243,0.2);
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* 可选：增加播放标识 */
+.song-item.active-song::before {
+    content: "▶";
+    color: var(--primary);
+    margin-right: 8px;
+    font-size: 12px;
+}
     </style>
 </head>
+<!-- body部分保持完全不变 -->
+<body>
 <body>
     <!-- 计时器 -->
     <div class="timer-container">
@@ -456,5 +581,6 @@
         window.onload = initPlaylist;
         setPlayMode('list_loop');
     </script>
+
 </body>
 </html>
