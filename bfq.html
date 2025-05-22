@@ -156,8 +156,8 @@
         <audio id="audioPlayer"></audio>
         
         <div class="mode-selector">
-            <button onclick="setPlayMode('single')">🔂 单曲</button>
-            <button onclick="setPlayMode('list')">🔁 列表</button>
+            <button onclick="toggleSingleMode()">🔂 单曲循环</button>
+            <button onclick="toggleListMode()">🔁 列表循环</button>
             <button onclick="setPlayMode('shuffle')">🎲 随机</button>
         </div>
 
@@ -190,7 +190,7 @@
         const playBtn = document.getElementById('playBtn');
         const progress = document.getElementById('progress');
         let currentIndex = 0;
-        let playMode = 'list';
+        let playMode = 'list_loop';
         let isDragging = false;
         
         const playlist = [
@@ -200,7 +200,6 @@
             }
         ];
 
-        // 初始化播放列表
         function initPlaylist() {
             const listElement = document.getElementById('songList');
             playlist.forEach((song, index) => {
@@ -213,7 +212,6 @@
             playSong(0);
         }
 
-        // 播放控制
         function playSong(index) {
             currentIndex = index;
             audio.src = playlist[currentIndex].url;
@@ -225,7 +223,6 @@
             highlightCurrentSong();
         }
 
-        // 时间格式化
         function formatTime(seconds) {
             if(isNaN(seconds)) return '00:00';
             const mins = Math.floor(seconds / 60);
@@ -233,7 +230,6 @@
             return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
-        // 进度条控制
         progress.addEventListener('input', () => {
             audio.currentTime = progress.value * audio.duration;
         });
@@ -241,7 +237,6 @@
         progress.addEventListener('mousedown', () => isDragging = true);
         progress.addEventListener('mouseup', () => isDragging = false);
 
-        // 时间更新
         audio.addEventListener('timeupdate', () => {
             document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
             if(audio.duration) {
@@ -252,33 +247,62 @@
             }
         });
 
-        // 播放模式
-        const modes = {
-            single: '🔂 单曲',
-            list: '🔁 列表',
-            shuffle: '🎲 随机'
-        };
-
         function setPlayMode(mode) {
             playMode = mode;
-            audio.loop = mode === 'single';
-            document.querySelectorAll('.mode-selector button').forEach(btn => {
-                btn.classList.remove('active');
-                if(btn.textContent === modes[mode]) btn.classList.add('active');
-            });
-            showStatus(`已切换至：${mode === 'single' ? '单曲循环' : mode === 'list' ? '列表循环' : '随机播放'}`);
+            audio.loop = (mode === 'single_loop');
+            updateModeButtons();
         }
 
-        // 播放结束处理
-        audio.addEventListener('ended', () => {
-            if(playMode === 'single') {
-                audio.play();
+        function toggleSingleMode() {
+            const newMode = playMode === 'single_loop' ? 'single_no_loop' : 'single_loop';
+            setPlayMode(newMode);
+        }
+
+        function toggleListMode() {
+            const newMode = playMode === 'list_loop' ? 'list_no_loop' : 'list_loop';
+            setPlayMode(newMode);
+        }
+
+        function updateModeButtons() {
+            const buttons = document.querySelectorAll('.mode-selector button');
+            buttons[0].textContent = playMode.startsWith('single') ? 
+                (playMode === 'single_loop' ? '🔂 单曲循环' : '⏹ 单曲不循环') : '🔂 单曲循环';
+            buttons[1].textContent = playMode.startsWith('list') ? 
+                (playMode === 'list_loop' ? '🔁 列表循环' : '⏹ 列表不循环') : '🔁 列表循环';
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            if(playMode === 'shuffle') {
+                buttons[2].classList.add('active');
             } else {
-                playNext();
+                buttons[playMode.startsWith('single') ? 0 : 1].classList.add('active');
+            }
+        }
+
+        audio.addEventListener('ended', () => {
+            switch(playMode) {
+                case 'single_loop':
+                    audio.play();
+                    break;
+                case 'single_no_loop':
+                    playBtn.textContent = '▶ 播放';
+                    playBtn.classList.remove('playing');
+                    break;
+                case 'list_loop':
+                    playNext();
+                    break;
+                case 'list_no_loop':
+                    if(currentIndex < playlist.length - 1) playNext();
+                    else {
+                        playBtn.textContent = '▶ 播放';
+                        playBtn.classList.remove('playing');
+                    }
+                    break;
+                case 'shuffle':
+                    playNext();
+                    break;
             }
         });
 
-        // 其他功能
         function togglePlay() {
             audio.paused ? audio.play() : audio.pause();
             playBtn.textContent = audio.paused ? '▶ 播放' : '⏸ 暂停';
@@ -289,6 +313,13 @@
             switch(playMode) {
                 case 'shuffle':
                     currentIndex = Math.floor(Math.random() * playlist.length);
+                    break;
+                case 'list_no_loop':
+                    currentIndex = (currentIndex + 1) % playlist.length;
+                    if(currentIndex === 0) {
+                        togglePlay();
+                        return;
+                    }
                     break;
                 default:
                     currentIndex = (currentIndex + 1) % playlist.length;
@@ -307,16 +338,14 @@
             });
         }
 
-        // 音量控制
         document.getElementById('volume').addEventListener('input', (e) => {
             audio.volume = e.target.value;
             document.getElementById('volumeValue').textContent = 
                 `${Math.round(e.target.value * 100)}%`;
         });
 
-        // 初始化
         window.onload = initPlaylist;
-        setPlayMode('list'); // 设置默认模式
+        setPlayMode('list_loop');
     </script>
 </body>
 </html>
