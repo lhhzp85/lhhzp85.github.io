@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>分钟时钟认知游戏</title>
+    <style>
+        body {
+            background: #F8F3E8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        #clockContainer {
+            position: relative;
+            margin: 30px;
+            background: #FFF;
+            border-radius: 50%;
+            box-shadow: 0 10px 20px rgba(255,165,0,0.2);
+        }
+
+        #clockCanvas {
+            width: 400px;
+            height: 400px;
+        }
+
+        .input-group {
+            margin: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        input {
+            width: 100px;
+            padding: 12px;
+            border: 3px solid #FFB6C1;
+            border-radius: 15px;
+            font-size: 24px;
+            text-align: center;
+            color: #FF69B4;
+        }
+
+        button {
+            padding: 12px 30px;
+            background: #87CEEB;
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+            background: #6495ED;
+        }
+
+        .feedback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            opacity: 0;
+            transition: all 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="color: #FF69B4;">⏰ 分钟时钟博士 ⏰</h1>
+    <div id="clockContainer">
+        <canvas id="clockCanvas" width="400" height="400"></canvas>
+        <div id="feedback" class="feedback"></div>
+    </div>
+    <div class="input-group">
+        <input type="number" id="hourInput" placeholder="时" min="0" max="12">
+        <input type="number" id="minuteInput" placeholder="分" min="0" max="59">
+    </div>
+    <button onclick="checkAnswer()">✓ 检查答案</button>
+
+<script>
+const canvas = document.getElementById('clockCanvas');
+const ctx = canvas.getContext('2d');
+const radius = canvas.width / 2;
+let currentHour = 9, currentMinute = 15;
+
+// 绘制带分钟刻度的表盘
+function drawClock() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // 绘制渐变背景
+    const gradient = ctx.createRadialGradient(radius, radius, 0, radius, radius, radius);
+    gradient.addColorStop(0, '#FFF0F5');
+    gradient.addColorStop(1, '#FFE4E1');
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(radius, radius, radius-10, 0, 2*Math.PI);
+    ctx.fill();
+
+    // 绘制分钟刻度（参考网页6的刻度绘制方法[6](@ref)）
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#87CEEB';
+    for(let i = 0; i < 60; i++) {
+        const angle = i * Math.PI/30;
+        ctx.beginPath();
+        const start = i % 5 === 0 ? radius-35 : radius-25;
+        ctx.moveTo(
+            radius + Math.sin(angle) * start,
+            radius - Math.cos(angle) * start
+        );
+        ctx.lineTo(
+            radius + Math.sin(angle) * (radius-15),
+            radius - Math.cos(angle) * (radius-15)
+        );
+        ctx.stroke();
+    }
+
+    // 绘制数字（小时内圈，分钟外圈）
+    ctx.font = '24px Comic Sans MS';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // 小时数字（内圈）
+    for(let i = 0; i < 12; i++) {
+        const angle = i * Math.PI/6;
+        const numRadius = radius-70;
+        ctx.fillStyle = '#FF69B4';
+        ctx.fillText(i||12, 
+            radius + Math.sin(angle)*numRadius, 
+            radius - Math.cos(angle)*numRadius
+        );
+    }
+    // 分钟数字（外圈，每5分钟）
+    ctx.font = '18px Comic Sans MS';
+    for(let i = 0; i < 12; i++) {
+        const angle = i * Math.PI/6;
+        const numRadius = radius-25;
+        ctx.fillStyle = '#87CEEB';
+        ctx.fillText(i*5, 
+            radius + Math.sin(angle)*numRadius, 
+            radius - Math.cos(angle)*numRadius
+        );
+    }
+
+    // 绘制指针（参考网页4的指针旋转计算[4](@ref)）
+    // 时针（含分钟偏移）
+    drawHand(
+        currentHour%12 * 30 + currentMinute*0.5, 
+        60, 10, '#FF69B4'
+    );
+    // 分针
+    drawHand(
+        currentMinute*6, 
+        100, 6, '#87CEEB'
+    );
+}
+
+function drawHand(angle, length, width, color) {
+    angle -= 90;
+    const radian = angle * Math.PI/180;
+    ctx.save();
+    ctx.translate(radius, radius);
+    ctx.rotate(radian);
+    ctx.beginPath();
+    ctx.moveTo(-width/2, 0);
+    ctx.lineTo(length, 0);
+    ctx.lineWidth = width;
+    ctx.strokeStyle = color;
+    ctx.lineCap = 'round';
+    ctx.shadowColor = 'rgba(0,0,0,0.2)';
+    ctx.shadowBlur = 8;
+    ctx.stroke();
+    ctx.restore();
+}
+
+// 生成随机时间（包含0-59分钟）
+function generateTime() {
+    currentHour = Math.floor(Math.random()*12);
+    currentMinute = Math.floor(Math.random()*60);
+}
+
+// 检查答案
+function checkAnswer() {
+    const feedback = document.getElementById('feedback');
+    const hour = parseInt(document.getElementById('hourInput').value);
+    const minute = parseInt(document.getElementById('minuteInput').value);
+    
+    if(hour === currentHour && minute === currentMinute) {
+        feedback.style.backgroundColor = '#98FB98';
+        feedback.style.boxShadow = '0 0 25px #98FB98';
+        feedback.textContent = '🎉 正确！';
+    } else {
+        feedback.style.backgroundColor = '#FFB6C1';
+        feedback.style.boxShadow = '0 0 25px #FFB6C1';
+        feedback.textContent = `正确时间\n${currentHour}时${currentMinute}分`;
+    }
+    feedback.style.opacity = '1';
+    setTimeout(() => {
+        feedback.style.opacity = '0';
+        generateTime();
+        drawClock();
+        document.getElementById('hourInput').value = '';
+        document.getElementById('minuteInput').value = '';
+    }, 2000);
+}
+
+// 初始化（参考网页8的时间获取方式[8](@ref)）
+generateTime();
+drawClock();
+</script>
+</body>
+</html>
