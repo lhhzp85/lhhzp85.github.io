@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>极简音乐播放器 Pro</title>
     <style>
-        /* 现代风格CSS设计 */
         :root {
             --primary: #2196F3;
             --secondary: #4CAF50;
@@ -69,6 +68,33 @@
             font-size: 14px;
         }
 
+        .progress-container {
+            margin: 1.5rem 0;
+        }
+
+        #progress {
+            width: 100%;
+            height: 4px;
+            background: #ddd;
+            border-radius: 2px;
+            transition: background 0.3s;
+        }
+
+        #progress::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        #progress:hover::-webkit-slider-thumb {
+            transform: scale(1.2);
+        }
+
         .volume-container {
             margin-top: 1.5rem;
             display: flex;
@@ -76,7 +102,6 @@
             gap: 10px;
         }
 
-        /* 自定义音量滑块 */
         input[type="range"] {
             -webkit-appearance: none;
             width: 120px;
@@ -93,10 +118,6 @@
             border-radius: 50%;
             cursor: pointer;
             transition: transform 0.2s;
-        }
-
-        input[type="range"]::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
         }
 
         .song-list {
@@ -122,36 +143,41 @@
             background: #e3f2fd!important;
             font-weight: 500;
         }
+
+        .mode-selector button.active {
+            background: var(--secondary);
+            box-shadow: 0 0 8px rgba(76,175,80,0.3);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
     <div class="player">
         <audio id="audioPlayer"></audio>
         
-        <!-- 播放模式选择 -->
         <div class="mode-selector">
             <button onclick="setPlayMode('single')">🔂 单曲</button>
             <button onclick="setPlayMode('list')">🔁 列表</button>
             <button onclick="setPlayMode('shuffle')">🎲 随机</button>
         </div>
 
-        <!-- 歌曲列表 -->
         <ul class="song-list" id="songList"></ul>
 
-        <!-- 时间显示 -->
         <div class="time-display">
             <span id="currentTime">00:00</span>
             <span id="duration">00:00</span>
         </div>
 
-        <!-- 主控制区 -->
+        <div class="progress-container">
+            <input type="range" id="progress" min="0" max="1" step="0.01" value="0">
+        </div>
+
         <div class="controls">
             <button onclick="playPrev()">⏮ 上一首</button>
             <button id="playBtn" onclick="togglePlay()">▶ 播放</button>
             <button onclick="playNext()">⏭ 下一首</button>
         </div>
 
-        <!-- 音量控制 -->
         <div class="volume-container">
             <span>🔊</span>
             <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
@@ -160,20 +186,18 @@
     </div>
 
     <script>
-        // 播放器核心逻辑
         const audio = document.getElementById('audioPlayer');
         const playBtn = document.getElementById('playBtn');
+        const progress = document.getElementById('progress');
         let currentIndex = 0;
         let playMode = 'list';
+        let isDragging = false;
         
-        // 播放列表（可扩展）
         const playlist = [
             { 
                 title: "Davai",
                 url: "https://lhhzp85.github.io/Artem%20Uzunov%20-%20Davai.ogg"
-            },
-            // 添加更多歌曲示例：
-            // { title: "示例歌曲2", url: "song2.mp3" }
+            }
         ];
 
         // 初始化播放列表
@@ -189,90 +213,80 @@
             playSong(0);
         }
 
-        // 播放指定歌曲
+        // 播放控制
         function playSong(index) {
             currentIndex = index;
             audio.src = playlist[currentIndex].url;
             audio.play().then(() => {
                 playBtn.textContent = '⏸ 暂停';
                 playBtn.classList.add('playing');
+                progress.value = 0;
             });
             highlightCurrentSong();
         }
 
-        // 时间格式化函数
+        // 时间格式化
         function formatTime(seconds) {
+            if(isNaN(seconds)) return '00:00';
             const mins = Math.floor(seconds / 60);
             const secs = Math.floor(seconds % 60);
             return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
-        // 更新播放时间
+        // 进度条控制
+        progress.addEventListener('input', () => {
+            audio.currentTime = progress.value * audio.duration;
+        });
+
+        progress.addEventListener('mousedown', () => isDragging = true);
+        progress.addEventListener('mouseup', () => isDragging = false);
+
+        // 时间更新
         audio.addEventListener('timeupdate', () => {
             document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
             if(audio.duration) {
                 document.getElementById('duration').textContent = formatTime(audio.duration);
+                if(!isDragging) {
+                    progress.value = audio.currentTime / audio.duration;
+                }
             }
         });
 
-        // 音量控制
-        const volumeControl = document.getElementById('volume');
-        volumeControl.addEventListener('input', (e) => {
-            audio.volume = e.target.value;
-            document.getElementById('volumeValue').textContent = 
-                `${Math.round(e.target.value * 100)}%`;
-        });
+        // 播放模式
+        const modes = {
+            single: '🔂 单曲',
+            list: '🔁 列表',
+            shuffle: '🎲 随机'
+        };
 
-        // 播放控制
-        function togglePlay() {
-            if(audio.paused) {
-                audio.play();
-                playBtn.textContent = '⏸ 暂停';
-                playBtn.classList.add('playing');
-            } else {
-                audio.pause();
-                playBtn.textContent = '▶ 播放';
-                playBtn.classList.remove('playing');
-            }
-        }
-
-        // 播放模式切换
         function setPlayMode(mode) {
             playMode = mode;
-            const modes = {
-                single: '单曲循环',
-                list: '列表循环',
-                shuffle: '随机播放'
-            };
-            showStatus(`已切换至：${modes[mode]}模式`);
+            audio.loop = mode === 'single';
+            document.querySelectorAll('.mode-selector button').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.textContent === modes[mode]) btn.classList.add('active');
+            });
+            showStatus(`已切换至：${mode === 'single' ? '单曲循环' : mode === 'list' ? '列表循环' : '随机播放'}`);
         }
 
-        // 状态提示
-        function showStatus(text) {
-            const status = document.createElement('div');
-            status.textContent = text;
-            status.style = `
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(0,0,0,0.8);
-                color: white;
-                padding: 8px 16px;
-                border-radius: 20px;
-                animation: fadeOut 1.5s 2s forwards;
-            `;
-            document.body.appendChild(status);
-            setTimeout(() => status.remove(), 3500);
+        // 播放结束处理
+        audio.addEventListener('ended', () => {
+            if(playMode === 'single') {
+                audio.play();
+            } else {
+                playNext();
+            }
+        });
+
+        // 其他功能
+        function togglePlay() {
+            audio.paused ? audio.play() : audio.pause();
+            playBtn.textContent = audio.paused ? '▶ 播放' : '⏸ 暂停';
+            playBtn.classList.toggle('playing', !audio.paused);
         }
 
-        // 下一首逻辑
         function playNext() {
             switch(playMode) {
-                case 'single': 
-                    audio.currentTime = 0;
-                    audio.play();
-                    break;
                 case 'shuffle':
                     currentIndex = Math.floor(Math.random() * playlist.length);
                     break;
@@ -282,15 +296,27 @@
             playSong(currentIndex);
         }
 
-        // 高亮当前歌曲
+        function playPrev() {
+            currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+            playSong(currentIndex);
+        }
+
         function highlightCurrentSong() {
             document.querySelectorAll('.song-item').forEach((item, index) => {
                 item.classList.toggle('active-song', index === currentIndex);
             });
         }
 
+        // 音量控制
+        document.getElementById('volume').addEventListener('input', (e) => {
+            audio.volume = e.target.value;
+            document.getElementById('volumeValue').textContent = 
+                `${Math.round(e.target.value * 100)}%`;
+        });
+
         // 初始化
         window.onload = initPlaylist;
+        setPlayMode('list'); // 设置默认模式
     </script>
 </body>
 </html>
