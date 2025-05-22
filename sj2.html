@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>可调节时钟教具</title>
+    <style>
+        /* 保持原有样式不变 */
+        body { display: flex; flex-direction: column; align-items: center; background: #f0f8ff; font-family: Arial, sans-serif; }
+        #gameContainer { position: relative; margin: 20px; }
+        #clockCanvas { border: 4px solid #4a90e2; border-radius: 50%; background: #fff; box-shadow: 0 10px 20px rgba(74,144,226,0.2); }
+        .controls { margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        button { padding: 10px 20px; background: #4a90e2; color: white; border: none; border-radius: 25px; cursor: pointer; transition: all 0.3s; }
+        button:hover { background: #357abd; transform: scale(1.05); }
+        #currentTime { font-size: 24px; color: #333; margin: 15px 0; }
+        #targetTime { font-size: 36px; color: #ff6b6b; margin: 15px 0; text-shadow: 2px 2px 4px rgba(255,107,107,0.3); }
+        #feedback { position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); padding: 10px 20px; border-radius: 20px; font-size: 18px; transition: all 0.5s; }
+    </style>
+</head>
+<body>
+    <h2>请将时钟调整到：<span id="targetTime">00:00</span></h2>
+    <div id="currentTime" style="display:none">当前设置：<span id="displayTime">00:00</span></div>
+    <div id="gameContainer">
+        <canvas id="clockCanvas" width="400" height="400"></canvas>
+        <div id="feedback"></div>
+    </div>
+    
+    <div class="controls">
+        <button id="hourUp">时针+1</button>
+        <button id="minuteUp">分针+1</button>
+        <button onclick="checkAnswer()">检查答案</button>
+        <button id="hourDown">时针-1</button>
+        <button id="minuteDown">分针-1</button>
+        <button onclick="newQuestion()">新题目</button>
+    </div>
+
+<script>
+const canvas = document.getElementById('clockCanvas');
+const ctx = canvas.getContext('2d');
+const center = {x:200, y:200};
+let targetTime = {h:0, m:0};
+let currentTime = {h:0, m:0, s:0}; // 添加完整的秒属性
+
+// 初始化按钮事件
+document.getElementById('hourUp').addEventListener('click', () => adjustTime('h', 1));
+document.getElementById('hourDown').addEventListener('click', () => adjustTime('h', -1));
+document.getElementById('minuteUp').addEventListener('click', () => adjustTime('m', 1));
+document.getElementById('minuteDown').addEventListener('click', () => adjustTime('m', -1));
+
+function adjustTime(type, value) {
+    if(type === 'h') {
+        currentTime.h = (currentTime.h + value + 12) % 12;
+    } else {
+        currentTime.m = (currentTime.m + value + 60) % 60;
+        currentTime.s = 0; // 关键修改：调整分钟时重置秒数
+    }
+    updateDisplay();
+    drawClock();
+}
+
+function updateDisplay() {
+    document.getElementById('displayTime').textContent = 
+        `${currentTime.h.toString().padStart(2,'0')}:${currentTime.m.toString().padStart(2,'0')}`;
+}
+
+function drawClock() {
+    ctx.clearRect(0, 0, 400, 400);
+    
+    // 表盘基底
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, 180, 0, Math.PI*2);
+    ctx.strokeStyle = '#4a90e2';
+    ctx.lineWidth = 8;
+    ctx.stroke();
+
+    // 刻度绘制
+    ctx.save();
+    ctx.translate(center.x, center.y);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "#aaa";
+    for(let i=0; i<60; i++){
+        ctx.beginPath();
+        ctx.rotate(6 * Math.PI/180);
+        ctx.moveTo(0, -160);
+        ctx.lineTo(0, -170);
+        ctx.stroke();
+    }
+    ctx.restore();
+
+    // 数字刻度
+    ctx.font = '24px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for(let i=1; i<=12; i++){
+        const angle = (i*30 - 90) * Math.PI/180;
+        const x = center.x + Math.cos(angle)*140;
+        const y = center.y + Math.sin(angle)*140;
+        ctx.fillStyle = i%3 ? '#666' : '#4a90e2';
+        ctx.fillText(i, x, y);
+    }
+
+    // 指针绘制函数
+    function drawHand(angle, length, width, color) {
+        ctx.save();
+        ctx.translate(center.x, center.y);
+        ctx.rotate(angle * Math.PI/180 - Math.PI/2);
+        ctx.beginPath();
+        ctx.moveTo(-width/2, 0);
+        ctx.lineTo(length, 0);
+        ctx.lineWidth = width;
+        ctx.strokeStyle = color;
+        ctx.lineCap = 'round';
+        ctx.shadowColor = 'rgba(0,0,0,0.2)';
+        ctx.shadowBlur = 8;
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    // 角度计算（关键修改：移除无效的秒数计算）
+    const hourAngle = currentTime.h * 30 + currentTime.m * 0.5;
+    const minuteAngle = currentTime.m * 6; // 移除秒数影响
+
+    drawHand(hourAngle, 60, 10, '#ff6b6b');
+    drawHand(minuteAngle, 90, 6, '#45b7d1');
+
+    // 中心轴
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, 6, 0, 2*Math.PI);
+    ctx.fillStyle = '#4a90e2';
+    ctx.fill();
+}
+
+function newQuestion() {
+    const feedback = document.getElementById('feedback');
+    feedback.textContent = '';
+    feedback.style.cssText = 'opacity:0; background-color:transparent;'; 
+    
+    targetTime = {
+        h: Math.floor(Math.random()*12),
+        m: Math.floor(Math.random()*60)
+    };
+    
+    currentTime = {
+        h: (targetTime.h + 3) % 12,
+        m: (targetTime.m + 20 + Math.floor(Math.random()*20)) % 60,
+        s: 0 // 初始化秒数
+    };
+    
+    document.getElementById('targetTime').innerHTML = 
+        `<span style="color:#4a90e2">${targetTime.h}</span>时
+        <span style="color:#45b7d1">${targetTime.m}</span>分`;
+    
+    updateDisplay();
+    drawClock();
+}
+
+function checkAnswer() {
+    const feedback = document.getElementById('feedback');
+    const correct = currentTime.h === targetTime.h && currentTime.m === targetTime.m;
+    const hourDiff = Math.abs(targetTime.h - currentTime.h);
+    const minuteDiff = Math.abs(targetTime.m - currentTime.m);
+    
+    if(correct) {
+        feedback.style.backgroundColor = 'rgba(0,255,0,0.3)';
+        feedback.innerHTML = '✓ 完全正确！';
+    } else {
+        feedback.style.backgroundColor = 'rgba(255,165,0,0.3)';
+        feedback.innerHTML = `需调整：${hourDiff>0 ? '时差'+hourDiff+'h' : ''} ${minuteDiff>0 ? '分差'+minuteDiff+'m' : ''}`;
+    }
+    feedback.style.opacity = '1';
+}
+
+// 初始化
+newQuestion();
+</script>
+</body>
+</html>
