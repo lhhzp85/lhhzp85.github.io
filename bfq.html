@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>极简音乐播放器 Pro</title>
+    <title>计时器 & 音乐播放器</title>
     <style>
         :root {
             --primary: #2196F3;
@@ -13,11 +13,56 @@
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             margin: 0;
+            padding: 2rem;
         }
 
+        /* 计时器样式 */
+        .timer-container {
+            background: rgba(255,255,255,0.95);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            width: 400px;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .timer-display {
+            font-size: 3.5rem;
+            text-align: center;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            color: #2196F3;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .timer-controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .timer-type-switch {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .timer-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        /* 播放器样式 */
         .player {
             background: rgba(255,255,255,0.95);
             padding: 2rem;
@@ -25,6 +70,7 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
             width: 400px;
             backdrop-filter: blur(10px);
+            margin-top: 2rem;
         }
 
         .controls {
@@ -46,15 +92,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
         .playing {
             background: var(--secondary);
             box-shadow: 0 0 15px rgba(76,175,80,0.3);
@@ -68,10 +105,6 @@
             font-size: 14px;
         }
 
-        .progress-container {
-            margin: 1.5rem 0;
-        }
-
         #progress {
             width: 100%;
             height: 4px;
@@ -80,44 +113,11 @@
             transition: background 0.3s;
         }
 
-        #progress::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 16px;
-            height: 16px;
-            background: var(--primary);
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
-            cursor: pointer;
-        }
-
-        #progress:hover::-webkit-slider-thumb {
-            transform: scale(1.2);
-        }
-
         .volume-container {
             margin-top: 1.5rem;
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-
-        input[type="range"] {
-            -webkit-appearance: none;
-            width: 120px;
-            height: 4px;
-            background: #ddd;
-            border-radius: 2px;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 16px;
-            height: 16px;
-            background: var(--primary);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.2s;
         }
 
         .song-list {
@@ -135,23 +135,45 @@
             transition: background 0.2s;
         }
 
-        .song-item:hover {
-            background: #f5f5f5;
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(33,150,243,0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(33,150,243,0); }
+            100% { box-shadow: 0 0 0 0 rgba(33,150,243,0); }
         }
 
-        .active-song {
-            background: #e3f2fd!important;
-            font-weight: 500;
-        }
-
-        .mode-selector button.active {
-            background: var(--secondary);
-            box-shadow: 0 0 8px rgba(76,175,80,0.3);
-            transform: translateY(-2px);
+        .active-timer {
+            animation: pulse 2s infinite;
         }
     </style>
 </head>
 <body>
+    <!-- 计时器 -->
+    <div class="timer-container">
+        <div class="timer-type-switch">
+            <button onclick="switchTimerType('countup')">⏱ 正计时</button>
+            <button onclick="switchTimerType('countdown')">⏳ 倒计时</button>
+        </div>
+        
+        <div id="countupSection">
+            <div class="timer-display" id="countupDisplay">00:00:00</div>
+            <div class="timer-controls">
+                <button onclick="startCountup()" id="countupStart">▶ 开始</button>
+                <button onclick="stopCountup()">⏹ 停止</button>
+            </div>
+        </div>
+
+        <div id="countdownSection" style="display:none;">
+            <input type="number" class="timer-input" id="countdownInput" 
+                   placeholder="输入分钟数" min="1" max="240">
+            <div class="timer-display" id="countdownDisplay">00:00:00</div>
+            <div class="timer-controls">
+                <button onclick="startCountdown()" id="countdownStart">▶ 启动</button>
+                <button onclick="resetTimers()">🔄 重置</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 音乐播放器 -->
     <div class="player">
         <audio id="audioPlayer"></audio>
         
@@ -186,6 +208,88 @@
     </div>
 
     <script>
+        // ================= 计时器功能 =================
+        let countupInterval;
+        let countdownInterval;
+        let isCountupRunning = false;
+        let countupSeconds = 0;
+        let countdownSeconds = 0;
+
+        function switchTimerType(type) {
+            document.getElementById('countupSection').style.display = 
+                type === 'countup' ? 'block' : 'none';
+            document.getElementById('countdownSection').style.display = 
+                type === 'countdown' ? 'block' : 'none';
+        }
+
+        function startCountup() {
+            if (!isCountupRunning) {
+                isCountupRunning = true;
+                countupInterval = setInterval(() => {
+                    countupSeconds++;
+                    updateCountupDisplay();
+                }, 1000);
+                document.getElementById('countupStart').textContent = '⏸ 暂停';
+            } else {
+                stopCountup();
+            }
+        }
+
+        function stopCountup() {
+            clearInterval(countupInterval);
+            isCountupRunning = false;
+            document.getElementById('countupStart').textContent = '▶ 继续';
+        }
+
+        function updateCountupDisplay() {
+            const hours = Math.floor(countupSeconds / 3600);
+            const minutes = Math.floor((countupSeconds % 3600) / 60);
+            const seconds = countupSeconds % 60;
+            document.getElementById('countupDisplay').textContent = 
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function startCountdown() {
+            const inputMinutes = parseInt(document.getElementById('countdownInput').value);
+            if (inputMinutes > 0 && !countdownInterval) {
+                countdownSeconds = inputMinutes * 60;
+                document.getElementById('countdownDisplay').classList.add('active-timer');
+                
+                countdownInterval = setInterval(() => {
+                    countdownSeconds--;
+                    if (countdownSeconds <= 0) {
+                        clearInterval(countdownInterval);
+                        countdownInterval = null;
+                        document.getElementById('countdownDisplay').classList.remove('active-timer');
+                        new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play();
+                    }
+                    updateCountdownDisplay();
+                }, 1000);
+            }
+        }
+
+        function updateCountdownDisplay() {
+            const minutes = Math.floor(countdownSeconds / 60);
+            const seconds = countdownSeconds % 60;
+            document.getElementById('countdownDisplay').textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function resetTimers() {
+            clearInterval(countupInterval);
+            clearInterval(countdownInterval);
+            countupSeconds = 0;
+            countdownSeconds = 0;
+            isCountupRunning = false;
+            countdownInterval = null;
+            document.getElementById('countupDisplay').textContent = '00:00:00';
+            document.getElementById('countdownDisplay').textContent = '00:00:00';
+            document.getElementById('countdownDisplay').classList.remove('active-timer');
+            document.getElementById('countdownInput').value = '';
+            document.getElementById('countupStart').textContent = '▶ 开始';
+        }
+
+        // ================= 音乐播放器 =================
         const audio = document.getElementById('audioPlayer');
         const playBtn = document.getElementById('playBtn');
         const progress = document.getElementById('progress');
@@ -196,12 +300,12 @@
         const playlist = [
             { 
                 title: "Davai",
-                url: "https://lhhzp85.github.io/Artem%20Uzunov%20-%20Davai.ogg"},
-     { 
+                url: "https://lhhzp85.github.io/Artem%20Uzunov%20-%20Davai.ogg"
+            },
+            { 
                 title: "我爱你中国",
                 url: "https://lhhzp85.github.io/music/woainizhongguo.ogg"
             }
-            
         ];
 
         function initPlaylist() {
@@ -348,6 +452,7 @@
                 `${Math.round(e.target.value * 100)}%`;
         });
 
+        // 初始化
         window.onload = initPlaylist;
         setPlayMode('list_loop');
     </script>
