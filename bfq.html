@@ -10,6 +10,18 @@
         /* 新增的按钮状态样式 */
         button {
             /* 基础状态 */
+			button {
+    transition: all 0.3s ease, border-color 0.2s linear;
+}
+
+button.active-mode {
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255,152,0,0.3); }
+    70% { box-shadow: 0 0 0 10px rgba(255,152,0,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,152,0,0); }
+}
 			
 			    white-space: nowrap; /* 新增禁止换行属性 */
     min-width: 80px; /* 新增最小宽度保持按钮一致性 */v
@@ -163,6 +175,13 @@ body {
     margin: 20px auto; /* 双保险居中 */
     backdrop-filter: blur(10px);
 }
+
+button.active-mode {
+    background: #FF9800 !important; /* 激活状态颜色 */
+    box-shadow: 0 0 8px rgba(255,152,0,0.3);
+    border: 2px solid #F57C00;
+}
+
         /* 计时器样式 */
         .timer-container {
             background: rgba(255,255,255,0.95);
@@ -385,11 +404,12 @@ input[type="range"] {
     <div class="player">
         <audio id="audioPlayer"></audio>
         
-        <div class="mode-selector">
-            <button onclick="toggleSingleMode()">🔂 单曲循环</button>
-            <button onclick="toggleListMode()">🔁 列表循环</button>
-            <button onclick="setPlayMode('shuffle')">🎲 随机</button>
-        </div>
+<div class="mode-selector">
+    <!-- 修改点击事件 -->
+    <button onclick="toggleSingleMode()">🔂 单曲循环</button>
+    <button onclick="toggleListMode()">🔁 列表循环</button>
+    <button onclick="setPlayMode('shuffle')">🎲 随机</button>
+</div>
 
         <ul class="song-list" id="songList"></ul>
 
@@ -425,6 +445,8 @@ input[type="range"] {
         let countdownSeconds = 0;
 let isPaused = false;
 let pausedSeconds = 0; // 新增暂停时间存储
+let isCountdownRunning = false;
+let pausedCountdownSeconds = 0;
 
 function startCountup() {
     if (!isCountupRunning) {
@@ -484,24 +506,42 @@ function stopCountup() {
                 `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
 
-        function startCountdown() {
-            const inputMinutes = parseInt(document.getElementById('countdownInput').value);
-            if (inputMinutes > 0 && !countdownInterval) {
-                countdownSeconds = inputMinutes * 60;
-                document.getElementById('countdownDisplay').classList.add('active-timer');
-                
-                countdownInterval = setInterval(() => {
-                    countdownSeconds--;
-                    if (countdownSeconds <= 0) {
-                        clearInterval(countdownInterval);
-                        countdownInterval = null;
-                        document.getElementById('countdownDisplay').classList.remove('active-timer');
-                        new Audio('https://lhhzp85.github.io/music/beep_short.ogg').play();
-                    }
-                    updateCountdownDisplay();
-                }, 1000);
+function startCountdown() {
+    const countdownStartBtn = document.getElementById('countdownStart');
+    
+    if (!isCountdownRunning) {
+        // 启动或恢复倒计时
+        let inputMinutes = parseInt(document.getElementById('countdownInput').value);
+        if (inputMinutes <= 0 && pausedCountdownSeconds <= 0) return;
+        
+        countdownSeconds = pausedCountdownSeconds || inputMinutes * 60;
+        document.getElementById('countdownDisplay').classList.add('active-timer');
+        
+        isCountdownRunning = true;
+        countdownStartBtn.textContent = '⏸ 暂停';
+        countdownInterval = setInterval(() => {
+            countdownSeconds--;
+            updateCountdownDisplay();
+            
+            if (countdownSeconds <= 0) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+                isCountdownRunning = false;
+                pausedCountdownSeconds = 0;
+                countdownStartBtn.textContent = '▶ 启动';
+                document.getElementById('countdownDisplay').classList.remove('active-timer');
+                new Audio('https://lhhzp85.github.io/music/beep_short.ogg').play();
             }
-        }
+        }, 1000);
+    } else {
+        // 暂停倒计时
+        clearInterval(countdownInterval);
+        pausedCountdownSeconds = countdownSeconds;
+        isCountdownRunning = false;
+        countdownStartBtn.textContent = '▶ 继续';
+    }
+}
+
 
         function updateCountdownDisplay() {
             const minutes = Math.floor(countdownSeconds / 60);
@@ -510,20 +550,17 @@ function stopCountup() {
                 `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
 
-        function resetTimers() {
-            clearInterval(countupInterval);
-            clearInterval(countdownInterval);
-            countupSeconds = 0;
-            countdownSeconds = 0;
-            isCountupRunning = false;
-            countdownInterval = null;
-            document.getElementById('countupDisplay').textContent = '00:00:00';
-            document.getElementById('countdownDisplay').textContent = '00:00:00';
-            document.getElementById('countdownDisplay').classList.remove('active-timer');
-            document.getElementById('countdownInput').value = '';
-            document.getElementById('countupStart').textContent = '▶ 开始';
-        }
-
+function resetTimers() {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+    isCountdownRunning = false;
+    pausedCountdownSeconds = 0;
+    countdownSeconds = 0;
+    document.getElementById('countdownDisplay').textContent = '00:00:00';
+    document.getElementById('countdownDisplay').classList.remove('active-timer');
+    document.getElementById('countdownInput').value = '';
+    document.getElementById('countdownStart').textContent = '▶ 启动';
+}
         // ================= 音乐播放器 =================
         const audio = document.getElementById('audioPlayer');
         const playBtn = document.getElementById('playBtn');
@@ -592,21 +629,26 @@ function stopCountup() {
             }
         });
 
-        function setPlayMode(mode) {
-            playMode = mode;
-            audio.loop = (mode === 'single_loop');
-            updateModeButtons();
-        }
+function setPlayMode(mode) {
+    playMode = mode;
+    audio.loop = (mode === 'single_loop'); // 仅单曲循环时启用原生循环
+    updateModeButtons(); // 新增调用
+}
 
-        function toggleSingleMode() {
-            const newMode = playMode === 'single_loop' ? 'single_no_loop' : 'single_loop';
-            setPlayMode(newMode);
-        }
+// 初始化时设置默认模式为列表不循环
+setPlayMode('list_loop'); // 默认列表循环
 
-        function toggleListMode() {
-            const newMode = playMode === 'list_loop' ? 'list_no_loop' : 'list_loop';
-            setPlayMode(newMode);
-        }
+// 单曲模式切换（原函数修改）
+function toggleSingleMode() {
+    const newMode = playMode === 'single_loop' ? 'single_no_loop' : 'single_loop';
+    setPlayMode(newMode);
+}
+
+// 列表模式切换（新增函数）
+function toggleListMode() {
+    const newMode = playMode === 'list_loop' ? 'list_no_loop' : 'list_loop';
+    setPlayMode(newMode);
+}
 
 function stopPlayback() {
     audio.pause();
@@ -616,20 +658,20 @@ function stopPlayback() {
     progress.value = 0; // 重置进度条
     document.getElementById('currentTime').textContent = '00:00'; // 重置时间显示
 }
-        function updateModeButtons() {
-            const buttons = document.querySelectorAll('.mode-selector button');
-            buttons[0].textContent = playMode.startsWith('single') ? 
-                (playMode === 'single_loop' ? '🔂 单曲循环' : '⏹ 单曲不循环') : '🔂 单曲循环';
-            buttons[1].textContent = playMode.startsWith('list') ? 
-                (playMode === 'list_loop' ? '🔁 列表循环' : '⏹ 列表不循环') : '🔁 列表循环';
-            
-            buttons.forEach(btn => btn.classList.remove('active'));
-            if(playMode === 'shuffle') {
-                buttons[2].classList.add('active');
-            } else {
-                buttons[playMode.startsWith('single') ? 0 : 1].classList.add('active');
-            }
-        }
+function updateModeButtons() {
+    const buttons = document.querySelectorAll('.mode-selector button');
+    
+    // 单曲循环按钮状态
+    buttons[0].classList.toggle('active-mode', playMode.startsWith('single_loop'));
+    buttons[0].textContent = '🔂 单曲循环'; // 保持名称不变
+    
+    // 列表循环按钮状态
+    buttons[1].classList.toggle('active-mode', playMode.startsWith('list_loop'));
+    buttons[1].textContent = '🔁 列表循环'; // 保持名称不变
+    
+    // 随机模式按钮状态
+    buttons[2].classList.toggle('active-mode', playMode === 'shuffle');
+}
 
         audio.addEventListener('ended', () => {
             switch(playMode) {
@@ -699,7 +741,7 @@ function stopPlayback() {
 
         // 初始化
         window.onload = initPlaylist;
-        setPlayMode('list_loop');
+     
     </script>
 
 </body>
