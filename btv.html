@@ -41,6 +41,14 @@
             background: #007bff;
             color: white;
         }
+        /* 新增音量控制样式 */
+        #volume-container {
+            margin: 10px 0;
+        }
+        #volume-slider {
+            width: 100px;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
@@ -48,6 +56,12 @@
     <div id="error-msg"></div>
     <video-js id="player" class="vjs-default-skin" controls preload="auto"></video-js>
     
+    <!-- 新增音量控制 -->
+    <div id="volume-container">
+        <label>音量控制：</label>
+        <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1">
+    </div>
+
     <ul id="playlist"></ul>
 
     <script src="https://unpkg.com/video.js@7.20.3/dist/video.min.js"></script>
@@ -72,6 +86,12 @@
             liveui: true,
             autoplay: 'any',
             muted: true
+        });
+
+        // 音量控制
+        const volumeSlider = document.getElementById('volume-slider');
+        volumeSlider.addEventListener('input', (e) => {
+            player.volume(e.target.value);
         });
 
         // 创建播放列表
