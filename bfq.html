@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -339,6 +341,39 @@ body {
         let isCountupRunning = false;
         let countupSeconds = 0;
         let countdownSeconds = 0;
+let isPaused = false;
+let pausedSeconds = 0; // 新增暂停时间存储
+
+function startCountup() {
+    if (!isCountupRunning) {
+        // 恢复暂停时读取存储的时间
+        if (isPaused) {
+            countupSeconds = pausedSeconds;
+            isPaused = false;
+        }
+        
+        isCountupRunning = true;
+        countupInterval = setInterval(() => {
+            countupSeconds++;
+            updateCountupDisplay();
+        }, 1000);
+        document.getElementById('countupStart').textContent = '⏸ 暂停';
+    } else {
+        pauseCountup();
+    }
+}
+
+// 新增独立暂停函数
+function pauseCountup() {
+    if (isCountupRunning) {
+        clearInterval(countupInterval);
+        pausedSeconds = countupSeconds; // 存储当前时间
+        isCountupRunning = false;
+        isPaused = true;
+        document.getElementById('countupStart').textContent = '▶ 继续';
+    }
+}
+
 
         function switchTimerType(type) {
             document.getElementById('countupSection').style.display = 
@@ -347,24 +382,17 @@ body {
                 type === 'countdown' ? 'block' : 'none';
         }
 
-        function startCountup() {
-            if (!isCountupRunning) {
-                isCountupRunning = true;
-                countupInterval = setInterval(() => {
-                    countupSeconds++;
-                    updateCountupDisplay();
-                }, 1000);
-                document.getElementById('countupStart').textContent = '⏸ 暂停';
-            } else {
-                stopCountup();
-            }
-        }
+        
 
-        function stopCountup() {
-            clearInterval(countupInterval);
-            isCountupRunning = false;
-            document.getElementById('countupStart').textContent = '▶ 继续';
-        }
+function stopCountup() {
+    clearInterval(countupInterval);
+    isCountupRunning = false;
+    isPaused = false;
+    countupSeconds = 0;
+    pausedSeconds = 0; // 清除暂停存储
+    updateCountupDisplay();
+    document.getElementById('countupStart').textContent = '▶ 开始';
+}
 
         function updateCountupDisplay() {
             const hours = Math.floor(countupSeconds / 3600);
