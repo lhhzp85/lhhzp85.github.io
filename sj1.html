@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -183,25 +184,29 @@ function drawHand(angle, length, width, color) {
 
 // 生成随机时间（包含0-59分钟）
 function generateTime() {
-    currentHour = Math.floor(Math.random()*12);
+    currentHour = Math.floor(Math.random()*12); // 保持0-11存储
     currentMinute = Math.floor(Math.random()*60);
 }
 
 // 检查答案
 function checkAnswer() {
     const feedback = document.getElementById('feedback');
-    const hour = parseInt(document.getElementById('hourInput').value);
-    const minute = parseInt(document.getElementById('minuteInput').value);
+    const userHour = parseInt(document.getElementById('hourInput').value) || 0;
+    const minute = parseInt(document.getElementById('minuteInput').value) || 0;
     
-    if(hour === currentHour && minute === currentMinute) {
+    const adjustedHour = userHour % 12;
+    const displayHour = currentHour === 0 ? 12 : currentHour;
+
+    if(adjustedHour === currentHour && minute === currentMinute) {
         feedback.style.backgroundColor = '#98FB98';
         feedback.style.boxShadow = '0 0 25px #98FB98';
         feedback.textContent = '🎉 正确！';
     } else {
         feedback.style.backgroundColor = '#FFB6C1';
         feedback.style.boxShadow = '0 0 25px #FFB6C1';
-        feedback.textContent = `正确时间\n${currentHour}时${currentMinute}分`;
+        feedback.textContent = `正确时间\n${displayHour}时${currentMinute}分`;
     }
+    
     feedback.style.opacity = '1';
     setTimeout(() => {
         feedback.style.opacity = '0';
