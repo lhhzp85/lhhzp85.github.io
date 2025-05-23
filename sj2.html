@@ -51,6 +51,9 @@ const center = {x:200, y:200};
 let targetTime = {h:0, m:0};
 let currentTime = {h:0, m:0, s:0}; // 添加完整的秒属性
 
+const correctSound = new Audio('https://lhhzp85.github.io/jiaoju/ok_zq.mp3');
+const errorSound = new Audio('https://lhhzp85.github.io/jiaoju/cuowu.mp3');
+
 // 新增分钟±5按钮事件
 document.getElementById('minuteUp5').addEventListener('click', () => adjustTime('m', 5));
 document.getElementById('minuteDown5').addEventListener('click', () => adjustTime('m', -5));
@@ -189,22 +192,36 @@ function newQuestion() {
 function checkAnswer() {
     const feedback = document.getElementById('feedback');
     const correct = currentTime.h === targetTime.h && currentTime.m === targetTime.m;
-    const hourDiff = Math.abs(targetTime.h - currentTime.h);
-    const minuteDiff = Math.abs(targetTime.m - currentTime.m);
     
+    // 播放对应音效
     if(correct) {
+        correctSound.currentTime = 0; // 重置播放进度
+        correctSound.play().catch(() => {}); // 防止浏览器静音策略报错
         feedback.style.backgroundColor = 'rgba(0,255,0,0.3)';
         feedback.innerHTML = '✅正确！';
     } else {
+        errorSound.currentTime = 0;
+        errorSound.play().catch(() => {});
         feedback.style.backgroundColor = 'rgba(255,165,0,0.3)';
-		 feedback.innerHTML = `❌错误`;
-        //feedback.innerHTML = `❌错误：${hourDiff>0 ? '时差'+hourDiff+'小时' : ''} ${minuteDiff>0 ? '分差'+minuteDiff+'分钟' : ''}`;
+        feedback.innerHTML = `❌错误`;
     }
     feedback.style.opacity = '1';
 }
 
 // 初始化
 newQuestion();
+
+window.addEventListener('load', () => {
+    correctSound.preload = 'auto';
+    errorSound.preload = 'auto';
+});
+
+// 处理浏览器静音策略（可选）
+document.addEventListener('click', () => {
+    // 通过用户交互初始化音频
+    correctSound.play().then(() => correctSound.pause());
+    errorSound.play().then(() => errorSound.pause());
+}, { once: true }); // 只执行一次
 </script>
 </body>
 </html>
