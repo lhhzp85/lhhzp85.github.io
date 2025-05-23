@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -75,6 +76,12 @@
             font-size: 24px;
             text-align: center;
         }
+		.button-group {
+    display: flex;
+    gap: 20px;
+    margin: 20px 0;
+    justify-content: center;
+}
     </style>
 </head>
 <body>
@@ -87,7 +94,10 @@
         <input type="number" id="hourInput" placeholder="时" min="0" max="12">
         <input type="number" id="minuteInput" placeholder="分" min="0" max="59">
     </div>
-    <button onclick="checkAnswer()">✓ 检查答案</button>
+<div class="button-group">
+    <button onclick="checkAnswer()">🚗 检查答案</button>
+    <button onclick="generateNewQuestion()" style="background: #77DD77;">🔄 新题目</button>
+</div>
 
 <script>
 const canvas = document.getElementById('clockCanvas');
@@ -96,7 +106,7 @@ const radius = canvas.width / 2;
 let currentHour = 9, currentMinute = 15;
 const correctSound = new Audio('https://lhhzp85.github.io/jiaoju/ok_zq.mp3');
 const wrongSound = new Audio('https://lhhzp85.github.io/jiaoju/cuowu.mp3');
-
+let isAnswered = false;
 
 const soundEffects = {
     correct: new Audio('https://lhhzp85.github.io/jiaoju/ok_zq.mp3'),
@@ -204,28 +214,42 @@ function checkAnswer() {
     const minute = parseInt(document.getElementById('minuteInput').value) || 0;
     
     const adjustedHour = userHour % 12;
-    const displayHour = currentHour === 0 ? 12 : currentHour;
 
     if(adjustedHour === currentHour && minute === currentMinute) {
         feedback.style.backgroundColor = '#98FB98';
         feedback.style.boxShadow = '0 0 25px #98FB98';
         feedback.textContent = '🎉 正确！';
-        soundEffects.correct.play(); // 播放正确音效[6,7](@ref)
+        soundEffects.correct.play();
+        isAnswered = true;
+        
+        // 正确后自动进入下一题
+        setTimeout(() => {
+            feedback.style.opacity = '0';
+            generateNewQuestion();
+        }, 1500);
     } else {
         feedback.style.backgroundColor = '#FFB6C1';
         feedback.style.boxShadow = '0 0 25px #FFB6C1';
-        feedback.textContent = `正确时间\n${displayHour}时${currentMinute}分`;
-        soundEffects.wrong.play(); // 播放错误音效[6,7](@ref)
+        feedback.textContent = '❌ 再试试';
+        soundEffects.wrong.play();
+        isAnswered = false;
+        
+        // 错误时保持输入内容
+        setTimeout(() => {
+            feedback.style.opacity = '0';
+        }, 1500);
     }
     
     feedback.style.opacity = '1';
-    setTimeout(() => {
-        feedback.style.opacity = '0';
-        generateTime();
-        drawClock();
-        document.getElementById('hourInput').value = '';
-        document.getElementById('minuteInput').value = '';
-    }, 2000);
+}
+
+// 下一题"功能
+function generateNewQuestion() {
+    generateTime();
+    drawClock();
+    document.getElementById('hourInput').value = '';
+    document.getElementById('minuteInput').value = '';
+    isAnswered = false;
 }
 
 // 初始化
