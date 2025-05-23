@@ -130,19 +130,38 @@ function drawClock() {
     ctx.lineWidth = 2;
     ctx.strokeStyle = '#87CEEB';
     for(let i = 0; i < 60; i++) {
-        const angle = i * Math.PI/30;
-        ctx.beginPath();
-        const start = i % 5 === 0 ? radius-35 : radius-25;
-        ctx.moveTo(
-            radius + Math.sin(angle) * start,
-            radius - Math.cos(angle) * start
-        );
-        ctx.lineTo(
-            radius + Math.sin(angle) * (radius-15),
-            radius - Math.cos(angle) * (radius-15)
-        );
-        ctx.stroke();
+    const angle = i * Math.PI/30;
+    
+    // 分级处理
+    let lineLength = 25;  // 默认长度
+    if(i % 15 === 0) {    // 15分钟刻度
+        ctx.strokeStyle = '#FFB6C1';
+        lineLength = 35;
+        ctx.lineWidth = 4;
+    } else if(i % 5 === 0) { // 5分钟刻度
+        ctx.strokeStyle = '#6495ED'; 
+        lineLength = 30;
+        ctx.lineWidth = 3;
+    } else {
+        ctx.strokeStyle = '#87CEEB';
+        ctx.lineWidth = 2;
     }
+
+    ctx.beginPath();
+    ctx.moveTo(
+        radius + Math.sin(angle) * (radius - lineLength),
+        radius - Math.cos(angle) * (radius - lineLength)
+    );
+    ctx.lineTo(
+        radius + Math.sin(angle) * (radius - 15),
+        radius - Math.cos(angle) * (radius - 15)
+    );
+    
+    // 添加发光效果
+    ctx.shadowColor = 'rgba(100,149,237,0.5)';
+    ctx.shadowBlur = 8;
+    ctx.stroke();
+}
 
     // 绘制数字（小时内圈，分钟外圈）
     ctx.font = '24px Comic Sans MS';
@@ -151,7 +170,7 @@ function drawClock() {
     // 小时数字（内圈）
     for(let i = 0; i < 12; i++) {
         const angle = i * Math.PI/6;
-        const numRadius = radius-70;
+        const numRadius = radius-50;
         ctx.fillStyle = '#FF69B4';
         ctx.fillText(i||12, 
             radius + Math.sin(angle)*numRadius, 
@@ -159,29 +178,31 @@ function drawClock() {
         );
     }
     // 分钟数字（外圈，每5分钟）
-    ctx.font = '18px Comic Sans MS';
-    for(let i = 0; i < 12; i++) {
-        const angle = i * Math.PI/6;
-        const numRadius = radius-25;
-        ctx.fillStyle = '#87CEEB';
-        ctx.fillText(i*5, 
-            radius + Math.sin(angle)*numRadius, 
-            radius - Math.cos(angle)*numRadius
-        );
-    }
+   // ctx.font = '18px Comic Sans MS';
+    //for(let i = 0; i < 12; i++) {
+    //    const angle = i * Math.PI/6;
+     //   const numRadius = radius-25;
+    //    ctx.fillStyle = '#87CEEB';
+    //    ctx.fillText(i*5, 
+   //         radius + Math.sin(angle)*numRadius, 
+   //         radius - Math.cos(angle)*numRadius
+  //      );
+ //   }
 
     // 绘制指针
     // 时针（含分钟偏移）
     drawHand(
         currentHour%12 * 30 + currentMinute*0.5, 
-        60, 10, '#FF69B4'
+        90, 10, '#FF69B4'
     );
     // 分针
     drawHand(
         currentMinute*6, 
-        100, 6, '#87CEEB'
+        135, 6, '#87CEEB'
     );
 }
+
+
 
 function drawHand(angle, length, width, color) {
     angle -= 90;
