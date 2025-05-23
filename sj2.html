@@ -216,7 +216,7 @@ window.addEventListener('load', () => {
     errorSound.preload = 'auto';
 });
 
-// 处理浏览器静音策略（可选）
+// 处理浏览器静音策略
 document.addEventListener('click', () => {
     // 通过用户交互初始化音频
     correctSound.play().then(() => correctSound.pause());
