@@ -107,7 +107,7 @@ function drawClock() {
     ctx.arc(radius, radius, radius-10, 0, 2*Math.PI);
     ctx.fill();
 
-    // 绘制分钟刻度（参考网页6的刻度绘制方法[6](@ref)）
+    // 绘制分钟刻度
     ctx.lineWidth = 2;
     ctx.strokeStyle = '#87CEEB';
     for(let i = 0; i < 60; i++) {
@@ -151,7 +151,7 @@ function drawClock() {
         );
     }
 
-    // 绘制指针（参考网页4的指针旋转计算[4](@ref)）
+    // 绘制指针
     // 时针（含分钟偏移）
     drawHand(
         currentHour%12 * 30 + currentMinute*0.5, 
@@ -217,7 +217,7 @@ function checkAnswer() {
     }, 2000);
 }
 
-// 初始化（参考网页8的时间获取方式[8](@ref)）
+// 初始化
 generateTime();
 drawClock();
 </script>
