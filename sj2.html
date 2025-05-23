@@ -1,11 +1,12 @@
 
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <title>可调节时钟教具</title>
     <style>
-        /* 保持原有样式不变 */
+        
         body { display: flex; flex-direction: column; align-items: center; background: #f0f8ff; font-family: Arial, sans-serif; }
         #gameContainer { position: relative; margin: 20px; }
         #clockCanvas { border: 4px solid #4a90e2; border-radius: 50%; background: #fff; box-shadow: 0 10px 20px rgba(74,144,226,0.2); }
@@ -81,8 +82,8 @@ function drawClock() {
     for(let i=0; i<60; i++){
         ctx.beginPath();
         ctx.rotate(6 * Math.PI/180);
-        ctx.moveTo(0, -160);
-        ctx.lineTo(0, -170);
+ctx.moveTo(0, -150);  // 起点更靠近中心
+ctx.lineTo(0, -170);  // 终点延长10px
         ctx.stroke();
     }
     ctx.restore();
@@ -93,8 +94,17 @@ function drawClock() {
     ctx.textBaseline = 'middle';
     for(let i=1; i<=12; i++){
         const angle = (i*30 - 90) * Math.PI/180;
-        const x = center.x + Math.cos(angle)*140;
-        const y = center.y + Math.sin(angle)*140;
+		if(i % 5 === 0) {
+    ctx.lineWidth = 3;
+    ctx.lineTo(0, -175);  // 长刻度多延长5px
+}else {
+            ctx.lineWidth = 1;
+            ctx.moveTo(0, -150);
+            ctx.lineTo(0, -170);
+        }
+        const x = center.x + Math.cos(angle)*130;  // 140 → 130
+const y = center.y + Math.sin(angle)*130;
+     
         ctx.fillStyle = i%3 ? '#666' : '#4a90e2';
         ctx.fillText(i, x, y);
     }
@@ -114,6 +124,15 @@ function drawClock() {
         ctx.shadowBlur = 8;
         ctx.stroke();
         ctx.restore();
+		
+		const gradient = ctx.createLinearGradient(-width/2,0,length,0);
+gradient.addColorStop(0, color);
+gradient.addColorStop(1, 'rgba(255,255,255,0.5)');
+ctx.strokeStyle = gradient;
+
+// 增加分针投影强化效果
+ctx.shadowColor = 'rgba(0,0,0,0.3)';
+ctx.shadowBlur = 12;
     }
 
     // 角度计算（关键修改：移除无效的秒数计算）
@@ -121,7 +140,7 @@ function drawClock() {
     const minuteAngle = currentTime.m * 6; // 移除秒数影响
 
     drawHand(hourAngle, 60, 10, '#ff6b6b');
-    drawHand(minuteAngle, 90, 6, '#45b7d1');
+    drawHand(minuteAngle, 120, 8, '#ff6b6b');
 
     // 中心轴
     ctx.beginPath();
