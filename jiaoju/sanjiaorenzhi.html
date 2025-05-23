@@ -78,6 +78,10 @@
         const ctx = canvas.getContext('2d');
         const resultDiv = document.getElementById('result');
         
+		const correctSound = new Audio('https://lhhzp85.github.io/jiaoju/ok_zq.mp3');
+		
+	 const wrongSound = new Audio('https://lhhzp85.github.io/jiaoju/cuowu.mp3');
+		
         // 几何参数配置
         const vertex = { x: 200, y: 150 };
         const armLength = 120;
@@ -122,15 +126,26 @@
             drawAngle(currentAngle);
         }
 
-        function checkAnswer(type) {
-            const angleType = 
-                currentAngle < 90 ? 'acute' :
-                currentAngle === 90 ? 'right' : 'obtuse';
-            
-            resultDiv.className = type === angleType ? 'correct' : 'wrong';
-            resultDiv.textContent = type === angleType ? '🎉 正确！好棒！' : '💡 再想想~';
-            resultDiv.style.visibility = 'visible';
+   function checkAnswer(type) {
+        const angleType = 
+            currentAngle < 90 ? 'acute' :
+            currentAngle === 90 ? 'right' : 'obtuse';
+
+        // 音效播放逻辑
+        if(type === angleType) {
+            correctSound.currentTime = 0; // 重置播放进度
+            correctSound.play().catch(e => console.error("正确音效错误:", e));
+        } else {
+            wrongSound.currentTime = 0;
+            wrongSound.play().catch(e => console.error("错误音效错误:", e));
         }
+
+        // 界面反馈逻辑
+        resultDiv.className = type === angleType ? 'correct' : 'wrong';
+        resultDiv.textContent = type === angleType ? '🎉 正确！好棒！' : '💡 再想想~';
+        resultDiv.style.visibility = 'visible';
+    }
+    
     </script>
 </body>
 </html>
