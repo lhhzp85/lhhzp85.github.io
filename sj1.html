@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -93,6 +94,14 @@ const canvas = document.getElementById('clockCanvas');
 const ctx = canvas.getContext('2d');
 const radius = canvas.width / 2;
 let currentHour = 9, currentMinute = 15;
+const correctSound = new Audio('https://lhhzp85.github.io/jiaoju/ok_zq.mp3');
+const wrongSound = new Audio('https://lhhzp85.github.io/jiaoju/cuowu.mp3');
+
+
+const soundEffects = {
+    correct: new Audio('https://lhhzp85.github.io/jiaoju/ok_zq.mp3'),
+    wrong: new Audio('https://lhhzp85.github.io/jiaoju/cuowu.mp3')
+};
 
 // 绘制带分钟刻度的表盘
 function drawClock() {
@@ -201,10 +210,12 @@ function checkAnswer() {
         feedback.style.backgroundColor = '#98FB98';
         feedback.style.boxShadow = '0 0 25px #98FB98';
         feedback.textContent = '🎉 正确！';
+        soundEffects.correct.play(); // 播放正确音效[6,7](@ref)
     } else {
         feedback.style.backgroundColor = '#FFB6C1';
         feedback.style.boxShadow = '0 0 25px #FFB6C1';
         feedback.textContent = `正确时间\n${displayHour}时${currentMinute}分`;
+        soundEffects.wrong.play(); // 播放错误音效[6,7](@ref)
     }
     
     feedback.style.opacity = '1';
